@@ -1,0 +1,21 @@
+<package>
+  <description brief="sherpa_spatial_relations">
+
+     sherpa_spatial_relations
+
+  </description>
+  <author>Fereshta Yazdani</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sherpa_spatial_relations</url>
+  <depend package="cram_roslisp_common"/>
+  <depend package="cram_designators"/>
+  <depend package="roslisp_runtime"/> 
+  <depend package="semantic_map_costmap"/>
+  <depend package="cram_language"/>
+  <depend package="cram_plan_knowledge"/>
+  <depend package="occupancy_grid_costmap"/>
+ <depend package="object_location_designators"/>
+</package>
+
+
