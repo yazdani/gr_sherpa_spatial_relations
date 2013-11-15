@@ -1,1 +1,1 @@
-(in-package :sherpa-pro)
+(in-package :sherpa)

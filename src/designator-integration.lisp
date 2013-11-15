@@ -1,1 +1,1 @@
-(in-package :sherpa-desig)
+(in-package :sherpa)

@@ -1,17 +1,12 @@
 (defsystem sherpa-spatial-relations
- :depends-on (cram-roslisp-common
-	      designators
-	      cram-reasoning
-	      roslisp
-	      semantic-map-costmap
+ :depends-on (roslisp
 	      cram-language
-	      cram-plan-knowledge
-	      occupancy-grid-costmap     
-	      object-location-designators)
+	      pr2-manipulation-process-module)
  :components 
  ((:module "src"
 	   :components
 	   ((:file "package")
 	    (:file "prolog" :depends-on ("package"))
 	    (:file "knowledge" :depends-on("package"))
+            (:file "build-test-world" :depends-on("package"))
             (:file "designator-integration" :depends-on("package"))))))

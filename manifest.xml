@@ -10,9 +10,12 @@
   <url>http://ros.org/wiki/sherpa_spatial_relations</url>
   <depend package="cram_roslisp_common"/>
   <depend package="cram_designators"/>
+  <depend package="location_costmap"/>
   <depend package="roslisp_runtime"/> 
   <depend package="semantic_map_costmap"/>
-  <depend package="cram_language"/>
+  <depend package="bullet_reasoning"/>
+  <depend package="cram_pr2_knowledge"/>
+  <!--<depend package="cram_language"/>-->
   <depend package="cram_plan_knowledge"/>
   <depend package="occupancy_grid_costmap"/>
  <depend package="object_location_designators"/>

@@ -1,1 +1,1 @@
-(in-package :sherpa-know)
+(in-package :sherpa)

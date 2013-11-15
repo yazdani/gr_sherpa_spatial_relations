@@ -1,0 +1,1 @@
+../sherpa_spatial_relations.asd
