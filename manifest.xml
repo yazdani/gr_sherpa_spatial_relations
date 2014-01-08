@@ -8,13 +8,15 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/sherpa_spatial_relations</url>
+  <!--<rosdep name="bullet"/>-->
   <depend package="gazebo_msgs"/>
  <depend package="actionlib"/>
  <depend package="roscpp"/>
  <depend package="pr2_controllers_msgs"/>
  <depend package="sensor_msgs"/>
- <!-- <depend package="cram_roslisp_common"/>
-  <depend package="cram_designators"/>
+ <depend package="cram_language"/>
+ <depend package="cram_roslisp_common"/>
+<!--  <depend package="cram_designators"/>
   <depend package="location_costmap"/>
   <depend package="roslisp_runtime"/> 
   <depend package="semantic_map_costmap"/>

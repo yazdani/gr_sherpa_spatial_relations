@@ -1,3 +1,3 @@
 (defpackage sherpa-spatial-relations
   (:nicknames :sherpa)
-  (:use #:cpl #:roslisp))
+  (:use #:cpl #:roslisp #:pr2-manip-pm))

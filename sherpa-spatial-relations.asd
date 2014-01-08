@@ -1,6 +1,8 @@
 (defsystem sherpa-spatial-relations
  :depends-on (roslisp
 	      cram-language
+	      cram-roslisp-common
+              actionlib
 	      pr2-manipulation-process-module)
  :components 
  ((:module "src"
