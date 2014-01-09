@@ -29,10 +29,34 @@
 
 (in-package :sherpa)
 
+(defvar *bdgs* nil)
+
 (defun start-scenario ()
   (start-myros)
+  (start-bullet-with-robot)
   (right-arm-trajectory)
   (end-myros))
+
+;; launch bullet_reasoning-files
+
+(defun start-bullet-with-robot ()
+(crs:prolog `(btr:debug-window ?_))
+(let* ((pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description_lowres")))) 
+  (setf *bdgs*
+        (car
+         (crs::force-ll
+          (crs:prolog
+           `(and
+             (clear-bullet-world)
+             (bullet-world ?w)
+             (assert (object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
+                             :normal (0 0 1) :constant 0))
+             (debug-window ?w) (robot ?robot)
+             (assert (object ?w pr2-urdf ?robot ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf))
+             (robot-arms-parking-joint-states ?joint-states)
+             (assert (joint-state ?w ?robot ?joint-states))
+             (assert (joint-state ?w ?robot (("torso_lift_joint" 0.33)))))))))))
+
 
 (defun start-myros ()
   (cram-roslisp-common:startup-ros :anonymous nil))
@@ -89,4 +113,6 @@
   (execute-right-arm-trajectory (default-position-to-trajectory))
   (start-myros)
   (execute-right-arm-trajectory (position-to-trajectory)))
+
+
 

@@ -10,22 +10,23 @@
   <url>http://ros.org/wiki/sherpa_spatial_relations</url>
   <!--<rosdep name="bullet"/>-->
   <depend package="gazebo_msgs"/>
- <depend package="actionlib"/>
- <depend package="roscpp"/>
- <depend package="pr2_controllers_msgs"/>
- <depend package="sensor_msgs"/>
- <depend package="cram_language"/>
- <depend package="cram_roslisp_common"/>
-<!--  <depend package="cram_designators"/>
-  <depend package="location_costmap"/>
-  <depend package="roslisp_runtime"/> 
-  <depend package="semantic_map_costmap"/>
-  <depend package="bullet_reasoning"/>
-  <depend package="cram_pr2_knowledge"/>
+  <depend package="actionlib"/>
+  <depend package="roscpp"/>
+  <depend package="pr2_controllers_msgs"/>
+  <depend package="sensor_msgs"/>
   <depend package="cram_language"/>
-  <depend package="cram_plan_knowledge"/>
-  <depend package="occupancy_grid_costmap"/>
- <depend package="object_location_designators"/>-->
+  <depend package="cram_roslisp_common"/>-->
+  <depend package="bullet_reasoning_designators" />
+  <depend package="bullet_reasoning"/>
+  <depend package="cram_designators"/>
+  <!-- <depend package="location_costmap"/>
+       <depend package="roslisp_runtime"/> 
+       <depend package="semantic_map_costmap"/>
+       <depend package="bullet_reasoning"/>-->
+       <depend package="cram_pr2_knowledge"/>
+       <depend package="cram_language"/>
+       <depend package="cram_plan_knowledge"/>
+       <depend package="object_location_designators"/>
 </package>
 
 
