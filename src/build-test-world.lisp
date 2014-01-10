@@ -40,22 +40,22 @@
 ;; launch bullet_reasoning-files
 
 (defun start-bullet-with-robot ()
-(crs:prolog `(btr:debug-window ?_))
+;(crs:prolog `(btr:debug-window ?w))
 (let* ((pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description_lowres")))) 
   (setf *bdgs*
         (car
          (crs::force-ll
           (crs:prolog
            `(and
-             (clear-bullet-world)
-             (bullet-world ?w)
-             (assert (object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
+             (btr:clear-bullet-world)
+             (btr:bullet-world ?w)
+             (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
                              :normal (0 0 1) :constant 0))
-             (debug-window ?w) (robot ?robot)
-             (assert (object ?w pr2-urdf ?robot ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf))
-             (robot-arms-parking-joint-states ?joint-states)
-             (assert (joint-state ?w ?robot ?joint-states))
-             (assert (joint-state ?w ?robot (("torso_lift_joint" 0.33)))))))))))
+             (btr:debug-window ?w) (btr:robot ?robot) 
+             (assert (btr:object ?w btr:urdf ?robot ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
+             (btr:robot-arms-parking-joint-states ?joint-states)
+             (assert (btr:joint-state ?w ?robot ?joint-states))
+             (assert (btr:joint-state ?w ?robot (("torso_lift_joint" 0.33)))))))))))
 
 
 (defun start-myros ()
