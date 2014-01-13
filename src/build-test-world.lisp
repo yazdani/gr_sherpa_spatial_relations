@@ -30,6 +30,7 @@
 (in-package :sherpa)
 
 (defvar *bdgs* nil)
+(defparameter *amount-of-victims* 1)
 
 (defun start-scenario ()
   (start-myros)
@@ -56,7 +57,29 @@
              (btr:robot-arms-parking-joint-states ?joint-states)
              (assert (btr:joint-state ?w ?robot ?joint-states))
              (assert (btr:joint-state ?w ?robot (("torso_lift_joint" 0.33)))))))))))
+           ;  (assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0))))
+           ;  (assert (btr:joint-state ?w ?robot (("r_shoulder_lift_joint" -0.5))))
+           ;  (assert (btr:joint-state ?w ?robot (("r_upper_arm_roll_joint" 0.0))))
+           ;  (assert (btr:joint-state ?w ?robot (("r_elbow_flex_joint" 0.0))))
+           ;  (assert (btr:joint-state ?w ?robot (("r_forearm_roll_joint" 0.0))))
+           ;  (assert (btr:joint-state ?w ?robot (("r_wrist_flex_joint" 0.0))))
+           ;  (assert (btr:joint-state ?w ?robot (("r_wrist_roll_joint" 1.5)))))))))))
 
+
+(defun execute-trajectory()
+  (crs:prolog
+   `(and 
+    ; (btr:bullet-world ?w)
+     (assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0))))
+     (assert (btr:joint-state ?w ?robot (("r_shoulder_lift_joint" -0.5))))
+     (assert (btr:joint-state ?w ?robot (("r_upper_arm_roll_joint" 0.0))))
+     (assert (btr:joint-state ?w ?robot (("r_elbow_flex_joint" 0.0))))
+     (assert (btr:joint-state ?w ?robot (("r_forearm_roll_joint" 0.0))))
+     (assert (btr:joint-state ?w ?robot (("r_wrist_flex_joint" 0.0))))
+     (assert (btr:joint-state ?w ?robot (("r_wrist_roll_joint" 1.5)))))))
+
+(defun assign-joint-pose (joint-type)
+  (prolog `(assign-joint , ...)))
 
 (defun start-myros ()
   (cram-roslisp-common:startup-ros :anonymous nil))
