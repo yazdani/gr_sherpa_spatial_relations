@@ -50,4 +50,5 @@
 	    (:file "prolog" :depends-on ("package"))
 	    (:file "knowledge" :depends-on("package"))
             (:file "build-test-world" :depends-on("package"))
+	    (:file "model_database" :depends-on("package"))
             (:file "designator-integration" :depends-on("package"))))))
