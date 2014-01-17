@@ -28,7 +28,15 @@
 
 (in-package :sherpa)
 
-;(def-fact-group sherpa-spatial-designators (action-desig))
+
+;def-fact-group sherpa-spatial-designators (action-desig)
+
+;<- (action-desig ?desig (trajectory arm) 
+  ; (bullet-world ?world
+  ; (robot ?robot)
+ ;  (desig-prop ?desig  (type trajectory))
+  ; (desig-prop ?desig  (side arm)
+    ;desig-prop ?designator (values ?value))))
 
 ;;right arm
 

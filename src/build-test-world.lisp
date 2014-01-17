@@ -29,22 +29,24 @@
 
 (in-package :sherpa)
 
-(defvar *bdgs* nil)
+(defvar *list* nil)
 (defparameter *amount-of-victims* 1)
 
 (defun start-scenario ()
   (start-myros)
   (start-bullet-with-robot)
-  (right-arm-trajectory)
-  (end-myros))
+  (execute-trajectory))
+  ;(end-myros))
 
 ;; launch bullet_reasoning-files
 
 (defun start-bullet-with-robot ()
 ;(crs:prolog `(btr:debug-window ?w))
-(let* ((pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description_lowres")))) 
-  (setf *bdgs*
-        (car
+;(setf *list* nil)
+(let* ((quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description")))
+       (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description_lowres"))))
+  (setf *list*
+        (car 
          (crs::force-ll
           (crs:prolog
            `(and
@@ -52,40 +54,62 @@
              (btr:bullet-world ?w)
              (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
                              :normal (0 0 1) :constant 0))
-             (btr:debug-window ?w) (btr:robot ?robot) 
-             (assert (btr:object ?w btr:urdf ?robot ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
-             (btr:robot-arms-parking-joint-states ?joint-states)
-             (assert (btr:joint-state ?w ?robot ?joint-states))
-             (assert (btr:joint-state ?w ?robot (("torso_lift_joint" 0.33)))))))))))
-           ;  (assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0))))
-           ;  (assert (btr:joint-state ?w ?robot (("r_shoulder_lift_joint" -0.5))))
-           ;  (assert (btr:joint-state ?w ?robot (("r_upper_arm_roll_joint" 0.0))))
-           ;  (assert (btr:joint-state ?w ?robot (("r_elbow_flex_joint" 0.0))))
-           ;  (assert (btr:joint-state ?w ?robot (("r_forearm_roll_joint" 0.0))))
-           ;  (assert (btr:joint-state ?w ?robot (("r_wrist_flex_joint" 0.0))))
-           ;  (assert (btr:joint-state ?w ?robot (("r_wrist_roll_joint" 1.5)))))))))))
+              (btr:debug-window ?w)
+           ;   (btr:robot ?rob  )
+              (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
+           ;   (btr:robot ?robot)
+              (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
+              (btr:robot-arms-parking-joint-states ?joint-states)
+             (assert (btr:joint-state ?w pr2 ?joint-states))
+             (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33))))
+)))))))
 
 
 (defun execute-trajectory()
   (crs:prolog
-   `(and 
-    ; (btr:bullet-world ?w)
-     (assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0))))
-     (assert (btr:joint-state ?w ?robot (("r_shoulder_lift_joint" -0.5))))
-     (assert (btr:joint-state ?w ?robot (("r_upper_arm_roll_joint" 0.0))))
-     (assert (btr:joint-state ?w ?robot (("r_elbow_flex_joint" 0.0))))
-     (assert (btr:joint-state ?w ?robot (("r_forearm_roll_joint" 0.0))))
-     (assert (btr:joint-state ?w ?robot (("r_wrist_flex_joint" 0.0))))
-     (assert (btr:joint-state ?w ?robot (("r_wrist_roll_joint" 1.5)))))))
+   `(assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0)("r_shoulder_lift_joint" -0.5) ("r_upper_arm_roll_joint" 0.0)("r_elbow_flex_joint" 0.0)("r_forearm_roll_joint" 0.0)("r_wrist_flex_joint" 0.0)("r_wrist_roll_joint" 1.5))))))
 
-(defun assign-joint-pose (joint-type)
-  (prolog `(assign-joint , ...)))
+;(defun execute-trajectory-with-desig (action-desig)
+; (sherpa-spatial-designators action-desig))
+ 
+; (crs:prolog
+  ; `(and 
+   ;  (assert (btr:joint-state ?w ?robot (;;PROLOG METHOD WITH AN ACTION-DESIG)))))))
+
+(defun reset-arms-parking ()
+  (crs:prolog `(and 
+                (btr:robot-arms-parking-joint-states ?joint-states)
+                       (assert (btr:joint-state ?w ?robot ?joint-states)))))
+
 
 (defun start-myros ()
   (cram-roslisp-common:startup-ros :anonymous nil))
 
 (defun end-myros ()
   (cram-roslisp-common:shutdown-ros))
+
+;(cpl-impl:def-top-level-cram-function right-arm-joint ()
+;  (cram-projection:with-projection-environment
+;      projection-process-modules::pr2-bullet-projection-environment
+;))
+
+;(defun make-trajectory-desig ()
+; (cram-designators:make-designator 'action `((joints (list ("" "" "" "" "" "" "" ""))) (values (list; (0.0 0.0 0.0 0.0 0.0 0.0)))))
+;)
+
+;(defun make-joint-desig (joint-name)
+;  (cram-designators:make-designator 'object `((joint joint-name)))
+;)
+
+
+;;;
+;;; STARTING PROLOG
+;;;
+
+
+;;;
+;;; EXECUTING A TRAJECTORY OF THE PR2 IN THE GAZEBO SIMULATION
+;;;
 
 (defun execute-right-arm-trajectory (trajec)
   (roslisp:ros-info (sherpa-spatial-relations) "Execute-right")
