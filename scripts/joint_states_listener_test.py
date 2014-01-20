@@ -2,9 +2,9 @@
 #test client for joint_states_listener
 
 import roslib
-roslib.load_manifest('joint_states_listener')
+roslib.load_manifest('sherpa_spatial_relations')
 import rospy
-from joint_states_listener.srv import ReturnJointStates
+from sherpa_spatial_relations.srv import ReturnJointStates
 import time
 import sys
 
