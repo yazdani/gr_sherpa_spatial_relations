@@ -44,7 +44,9 @@
 ;(crs:prolog `(btr:debug-window ?w))
 ;(setf *list* nil)
 (let* ((quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description")))
-       (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description_lowres"))))
+       (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description_lowres")))
+       ;(world )
+       )
   (setf *list*
         (car 
          (crs::force-ll
@@ -54,6 +56,8 @@
              (btr:bullet-world ?w)
              (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
                              :normal (0 0 1) :constant 0))
+           ;;(assert (btr:object world btr:static-plane mountain ((0 0 0) (0 0 0 1))
+                         ;;    :normal (0 0 1) :constant 0))
               (btr:debug-window ?w)
            ;   (btr:robot ?rob  )
               (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
@@ -83,10 +87,10 @@
 
 
 (defun start-myros ()
-  (cram-roslisp-common:startup-ros :anonymous nil))
+  (roslisp-utilities:startup-ros :anonymous nil))
 
 (defun end-myros ()
-  (cram-roslisp-common:shutdown-ros))
+  (roslisp-utilities:shutdown-ros))
 
 ;(cpl-impl:def-top-level-cram-function right-arm-joint ()
 ;  (cram-projection:with-projection-environment
