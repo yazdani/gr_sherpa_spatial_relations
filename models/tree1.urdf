@@ -5,13 +5,13 @@
      <visual>
        <!-- <origin xyz="-4 -3 0"/> -->
         <geometry>
-        <mesh filename="package://sherpa_spatial_relations/models/tree1.dae"/>
+        <mesh filename="package://sherpa_spatial_relations/models/tree1.stl"/>
         </geometry>
      </visual> 
 
 <collision>
 <geometry>
-  <mesh filename="package://sherpa_spatial_relations/models/tree1.dae"/>
+  <mesh filename="package://sherpa_spatial_relations/models/tree2.stl"/>
 </geometry>
 </collision>
 </link>

@@ -41,6 +41,20 @@
   (end-myros))
 
 
+;desig for a direction
+;;(defun make-location-desig (direction)
+;;(make-designator 'desig-props:location '((desig-props:go-to ,direction)
+;;                                         (desig-props:close-to avalanche1))))
+
+;define fuction to go in a direction
+;;(defun command-robot (direction)
+;;(try-solving direction))
+
+;define try-solving function
+;;(defun try-solving (direction)
+  
+;;(def-fact-group build-test-world()
+;;(<- 
 ;; ;; (defun init-joint-states ()
 ;; ;; (setf *joint-states-sub*
 ;; ;;       (roslisp:subscribe "/joint_states"
@@ -60,8 +74,8 @@
 (defun start-bullet-with-robot ()
 ;(crs:prolog `(btr:debug-window ?w))
 (setf *list* nil)
- (let* ((quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description")))
-        (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description_lowres")))
+ (let* ((quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description_lowres")))
+        (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description")))
         (tree-urdf (cl-urdf:parse-urdf (roslisp:get-param "env/tree_description"))))
    (setf *list*
          (car 
@@ -79,12 +93,23 @@
                (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
             ;   (btr:robot ?robot)
                (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
-               (assert (btr:object ?w btr:urdf tree ((6 -6 1) (0 0 0 1)) :urdf ,tree-urdf))
+               (assert (btr:object ?w wood tree ((6 -6 1) (0 0 0 1)) :urdf ,tree-urdf))
+;;             (assert (btr:object ?w btr:mesh tree ((1 0 1) (0 0 0 1)) :mesh btr:tree :mass 0.2 :color (1 1 1)))))
+
             ;   (btr:robot-arms-parking-joint-states ?joint-states)
             ;  (assert (btr:joint-state ?w pr2 ?joint-states))
            ;   (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33))))
  )))))))
 
+
+(defun spawn-tree ()
+ (crs:prolog `(and (btr:bullet-world ?w)
+		   (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
+				       :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
+       (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
+                           :mesh btr::tree2 :mass 0.2 :color (0 0 0)))
+       (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
+                           :mesh btr::tree3 :mass 0.2 :color (0 0 0))))))
 
  (defun execute-trajectory()
    (crs:prolog
