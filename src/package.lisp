@@ -31,4 +31,5 @@
   (:use #:roslisp #:cpl #:desig #:cram-roslisp-common #:cram-plan-knowledge
 	#:cram-designators #:cram-plan-library)
   (:import-from #:cram-reasoning #:<- #:def-fact-group)
-  (:desig-properties #:joint #:joints #:values))
+  (:export tree)
+  (:desig-properties #:go-to #:close-to tree))
