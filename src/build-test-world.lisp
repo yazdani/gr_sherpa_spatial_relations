@@ -71,62 +71,64 @@
 ;;            for e = (elt effort i)
 ;;            collect (cons n (list p v e))))))
 
+;;starting the bullet_visualization with the pr2 and the quadrotor
+;;TODO MESHES!!!
 (defun start-bullet-with-robot ()
-;(crs:prolog `(btr:debug-window ?w))
 (setf *list* nil)
- (let* ((quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description_lowres")))
-        (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description"))))
-       ;; (tree-urdf (cl-urdf:parse-urdf (roslisp:get-param "env/tree_description"))))
-   (setf *list*
-         (car 
-          (crs::force-ll
-           (crs:prolog
-            `(and
-              (btr:clear-bullet-world)
-              (btr:bullet-world ?w)
-              (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
-                              :normal (0 0 1) :constant 0))
-            ;;(assert (btr:object world btr:static-plane mountain ((0 0 0) (0 0 0 1))
-                          ;;    :normal (0 0 1) :consta(nt 0))
-               (btr:debug-window ?w)
-            ;   (btr:robot ?rob  )
-               (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
-            ;   (btr:robot ?robot)
-               (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
-            ;   (assert (btr:object ?w wood tree ((6 -6 1) (0 0 0 1)) :urdf ,tree-urdf))
-;;             (assert (btr:object ?w btr:mesh tree ((1 0 1) (0 0 0 1)) :mesh btr:tree :mass 0.2 :color (1 1 1)))))
+(let* ((quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description")))
+       (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description"))))
+  (setf *list*
+	(car 
+	 (crs::force-ll
+	  (crs:prolog
+	   `(and
+	     (btr:clear-bullet-world)
+	     (btr:bullet-world ?w)
+	     (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
+				 :normal (0 0 1) :constant 0))
+	      (btr:debug-window ?w)
+	      (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
+	      (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
+	      ;;   (btr:robot-arms-parking-joint-states ?joint-states)
+	      ;;  (assert (btr:joint-state ?w pr2 ?joint-states))
+	      ;;   (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33))))
+	      )))))))
 
-            ;   (btr:robot-arms-parking-joint-states ?joint-states)
-            ;  (assert (btr:joint-state ?w pr2 ?joint-states))
-           ;   (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33))))
- )))))))
-
-
+;;spawning the kind of trees
 (defun spawn-tree ()
- (crs:prolog `(and (btr:bullet-world ?w)
-		   (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
+  (crs:prolog `(and (btr:bullet-world ?w)
+		    (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
                            :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
-       (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
-                           :mesh btr::tree2 :mass 0.2 :color (0 0 0)))
-       (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
-                           :mesh btr::tree3 :mass 0.2 :color (0 0 0))))))
+		    (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
+					:mesh btr::tree2 :mass 0.2 :color (0 0 0)))
+		    (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
+					:mesh btr::tree3 :mass 0.2 :color (0 0 0)))
+         (assert (btr:object ?w btr:mesh tree-4 ((6 6 0)(0 0 0 1))
+					:mesh btr::tree3 :mass 0.2 :color (0 0 0))))))
 
- (defun execute-trajectory()
-   (crs:prolog
-    `(assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0)("r_shoulder_lift_joint" -0.5) ("r_upper_arm_roll_joint" 0.0)("r_elbow_flex_joint" 0.0)("r_forearm_roll_joint" 0.0)("r_wrist_flex_joint" 0.0)("r_wrist_roll_joint" 1.5))))))
+
+(defun execute-trajectory()
+  (crs:prolog
+   `(assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0)
+					("r_shoulder_lift_joint" -0.5) 
+					("r_upper_arm_roll_joint" 0.0)
+					("r_elbow_flex_joint" 0.0)
+					("r_forearm_roll_joint" 0.0)
+					("r_wrist_flex_joint" 0.0)
+					("r_wrist_roll_joint" 1.5))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;START OF DESIG;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun make-loc-desig (obj-desig)
-  (make-designator `location `((desig-props:right-of object-desig))))
+;(defun make-loc-desig (obj-desig)
+ ; (make-designator `location `((desig-props:right-of object-desig))))
  
-(defun make-obj-desig (obj-name)
-  (make-designator `object `((desig-props:name obj-name))))
+;(defun make-obj-desig (obj-name)
+ ; (make-designator `object `((desig-props:name obj-name))))
 
-(defun go-to-direction (loc-desig obj-desig)
- (with-designators
-     ((desig-for-loc (desig:location `((desig-props:right-of ,obj-desig)))))
-   (crs:prolog `(assign-direction ,desig-for-loc))))
+;(defun go-to-direction (loc-desig obj-desig)
+ ;(with-designators
+  ;   ((desig-for-loc (desig:location `((desig-props:right-of ,obj-desig)))))
+  ; (crs:prolog `(assign-direction ,desig-for-loc))))
 
 
 ;; (def-fact-group build-test-world ()

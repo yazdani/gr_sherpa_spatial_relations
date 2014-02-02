@@ -32,4 +32,4 @@
 	#:cram-designators #:cram-plan-library)
   (:import-from #:cram-reasoning #:<- #:def-fact-group)
   (:export tree)
-  (:desig-properties #:go-to #:close-to tree #:right-of #:name))
+  (:desig-properties #:go-to #:close-to #:right-of #:name tree))
