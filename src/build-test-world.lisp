@@ -33,14 +33,91 @@
 (defvar *joint-list* nil)
 (defvar *joint-states-sub* nil)
 (defparameter *amount-of-victims* 1)
-
+(defparameter *tree-hash-table* (make-hash-table))
 (defun start-scenario ()
   (start-myros)
   (start-bullet-with-robot)
-  (execute-trajectory)
+  (pr2-execute-trajectory)
   (end-myros))
 
+;;starting the bullet_visualization with the pr2 and the quadrotor
+;;TODO MESHES!!!
+(defun start-bullet-with-robot ()
+(setf *list* nil)
+(let* (;(quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description")))
+       (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description"))))
+  (setf *list*
+	(car 
+	 (crs::force-ll
+	  (crs:prolog
+	   `(and
+	     (btr:clear-bullet-world)
+	     (btr:bullet-world ?w)
+	     (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
+				 :normal (0 0 1) :constant 0))
+	      (btr:debug-window ?w)
+	     ; (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
+	      (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
+	      ;;   (btr:robot-arms-parking-joint-states ?joint-states)
+	      ;;  (assert (btr:joint-state ?w pr2 ?joint-states))
+	      ;;   (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33))))
+	      )))))))
 
+;;spawning some trees
+(defun spawn-tree ()
+  (crs::force-ll (crs:prolog `(and (btr:bullet-world ?w)
+		    (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
+                            :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
+       (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
+                            :mesh btr::tree2 :mass 0.2 :color (0 0 0)))
+      (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
+                            :mesh btr::tree3 :mass 0.2 :color (0 0 0)))
+        (assert (btr:object ?w btr:mesh tree-4 ((6 0 0)(0 0 0 1))
+                            :mesh btr::tree4 :mass 0.2 :color (0 0 0)))))))
+
+(defun spawn-robot ()
+  (crs::force-ll 
+   (crs:prolog `(and (btr:bullet-world ?w)
+                     (assert (btr:object ?w btr:mesh quad-1 ((1 1 1)(0 0 0 1))
+                                         :mesh btr::quad1 :mass 0.2 :color (1 0 0)))))))
+
+;;remove all trees considering the object-type
+(defun remove-tree () 
+   (crs::force-ll (crs:prolog `(and (btr:bullet-world ?w)
+                                              (btr:object-type ?w ?obj btr::household-object)
+                                              (btr:retract (btr:object ?w ?obj))))))
+  
+(defun pr2-execute-trajectory ()
+  (crs:prolog
+   `(assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0)
+                                        ("r_shoulder_lift_joint" -0.5) 
+                                        ("r_upper_arm_roll_joint" 0.0)
+                                        ("r_elbow_flex_joint" 0.0)
+                                        ("r_forearm_roll_joint" 0.0)
+                                        ("r_wrist_flex_joint" 0.0)
+                                        ("r_wrist_roll_joint" 1.5))))))
+
+(defun pointing-into-direction (object-name)
+  (cram-language-implementation:top-level
+    (plan-lib:with-designators
+        ((des-for-loc (desig-props:location `((right-of tree-1) 
+                                              (far-from tree-1) 
+                                              (for ,object-name)))))
+      (crs:prolog `(assign-robot-pos-to ,des-for-loc ,object-name)))))
+
+
+
+(def-fact-group build-test-world()
+  (<- (assign-robot-pos-to ?desig ?obj-name) 
+    (btr::bound ?obj-name)
+    (btr::bound ?desig)
+    (btr:bullet-world ?world)
+    (btr::desig-solutions ?desig ?solutions)
+    (btr::take 6 ?solutions ?6-solutions)
+    (btr::member ?solution ?6-solutions)
+    (assert (btr::object-pose-on ?world ?obj-name ?solution))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;START WITH INCOMPLETE CODE;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;desig for a direction
 ;;(defun make-location-desig (direction)
 ;;(make-designator 'desig-props:location '((desig-props:go-to ,direction)
@@ -53,8 +130,6 @@
 ;define try-solving function
 ;;(defun try-solving (direction)
   
-;;(def-fact-group build-test-world()
-;;(<- 
 ;; ;; (defun init-joint-states ()
 ;; ;; (setf *joint-states-sub*
 ;; ;;       (roslisp:subscribe "/joint_states"
@@ -71,51 +146,6 @@
 ;;            for e = (elt effort i)
 ;;            collect (cons n (list p v e))))))
 
-;;starting the bullet_visualization with the pr2 and the quadrotor
-;;TODO MESHES!!!
-(defun start-bullet-with-robot ()
-(setf *list* nil)
-(let* ((quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description")))
-       (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description"))))
-  (setf *list*
-	(car 
-	 (crs::force-ll
-	  (crs:prolog
-	   `(and
-	     (btr:clear-bullet-world)
-	     (btr:bullet-world ?w)
-	     (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
-				 :normal (0 0 1) :constant 0))
-	      (btr:debug-window ?w)
-	      (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
-	      (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
-	      ;;   (btr:robot-arms-parking-joint-states ?joint-states)
-	      ;;  (assert (btr:joint-state ?w pr2 ?joint-states))
-	      ;;   (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33))))
-	      )))))))
-
-;;spawning the kind of trees
-(defun spawn-tree ()
-  (crs:prolog `(and (btr:bullet-world ?w)
-		    (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
-                           :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
-		    (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
-					:mesh btr::tree2 :mass 0.2 :color (0 0 0)))
-		    (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
-					:mesh btr::tree3 :mass 0.2 :color (0 0 0)))
-         (assert (btr:object ?w btr:mesh tree-4 ((6 6 0)(0 0 0 1))
-					:mesh btr::tree3 :mass 0.2 :color (0 0 0))))))
-
-
-(defun execute-trajectory()
-  (crs:prolog
-   `(assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0)
-					("r_shoulder_lift_joint" -0.5) 
-					("r_upper_arm_roll_joint" 0.0)
-					("r_elbow_flex_joint" 0.0)
-					("r_forearm_roll_joint" 0.0)
-					("r_wrist_flex_joint" 0.0)
-					("r_wrist_roll_joint" 1.5))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;START OF DESIG;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -241,3 +271,4 @@
 
  
 
+q
