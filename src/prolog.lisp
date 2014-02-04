@@ -28,17 +28,23 @@
 
 (in-package :sherpa)
 
+(defmethod costmap-generator-name->score ((name (eql 'spatial-relation-generator))) 5)
 
-;def-fact-group sherpa-spatial-designators (action-desig)
+(def-fact-group sherpa-spatial-designators (desig-costmap)
 
-;<- (action-desig ?desig (trajectory arm) 
-  ; (bullet-world ?world
-  ; (robot ?robot)
- ;  (desig-prop ?desig  (type trajectory))
-  ; (desig-prop ?desig  (side arm)
-    ;desig-prop ?designator (values ?value))))
+;; (<- (action-desig ?desig (trajectory arm))
+;;    (bullet-world ?world)
+;;    (robot ?robot)
+;;    (desig-prop ?desig  (type trajectory))
+;;    (desig-prop ?desig  (side arm)
+;;    (desig-prop ?designator (values ?value))))
 
 ;;right arm
 
-;(<- (action-desig ?desig
-;)
+  (<- (desig-costmap ?designator ?costmap)
+    (desig-prop ?designator (right-of ?location))
+    (costmap ?costmap)
+    (costmap-add-function
+     spatial-relation-generator
+     (make-spatial-relation-cost-function ?location :Y <)
+     ?costmap)))

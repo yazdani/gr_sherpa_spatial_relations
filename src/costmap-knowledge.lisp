@@ -26,19 +26,15 @@
 ;;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ;;; POSSIBILITY OF SUCH DAMAGE.
 
-(desig-props:def-desig-package sherpa-spatial-relations
-  (:nicknames :sherpa)
-  (:use #:common-lisp
-        #:roslisp
-;;        #:cpl
-        #:cram-roslisp-common
-        #:cram-designators
-;;        #:cram-plan-library
-        #:location-costmap
-        #:cram-reasoning
-        #:cram-utilities
-        #:btr)
-  (:shadowing-import-from #:btr object pose object-pose width height robot)
-  (:import-from #:cram-reasoning #:<- #:def-fact-group)
-  (:export tree)
-  (:desig-properties #:go-to #:close-to #:right-of #:far-from #:for-robot #:name tree))
+
+(in-package :sherpa)
+
+(def-fact-group costmap-metadata ()
+  (<- (costmap-size 8 8))
+  (<- (costmap-origin -4 -4))
+  (<- (costmap-resolution 0.01))
+  (<- (costmap-padding 0.38))
+  (<- (costmap-manipulation-padding 0.38))
+  (<- (costmap-in-reach-distance 1.0))
+  (<- (costmap-reach-minimal-distance 0.2)))
+

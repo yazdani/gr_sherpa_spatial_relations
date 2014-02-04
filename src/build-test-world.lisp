@@ -40,7 +40,7 @@
   (pr2-execute-trajectory)
   (end-myros))
 
-;;starting the bullet_visualization with the pr2 and the quadrotor
+;;starting the bullet_visualization with the pr2
 ;;TODO MESHES!!!
 (defun start-bullet-with-robot ()
 (setf *list* nil)
@@ -54,26 +54,25 @@
 	     (btr:clear-bullet-world)
 	     (btr:bullet-world ?w)
 	     (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
-				 :normal (0 0 1) :constant 0))
-	      (btr:debug-window ?w)
-	     ; (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
-	      (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
-	      ;;   (btr:robot-arms-parking-joint-states ?joint-states)
-	      ;;  (assert (btr:joint-state ?w pr2 ?joint-states))
-	      ;;   (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33))))
-	      )))))))
-
+                           :normal (0 0 1) :constant 0))
+       (btr:debug-window ?w)
+       ;; (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
+       (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
+       (btr:robot-arms-parking-joint-states ?joint-states)
+       (assert (btr:joint-state ?w pr2 ?joint-states))
+       (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33)))))))))))
+	      
 ;;spawning some trees
 (defun spawn-tree ()
   (crs::force-ll (crs:prolog `(and (btr:bullet-world ?w)
-		    (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
-                            :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
-       (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
-                            :mesh btr::tree2 :mass 0.2 :color (0 0 0)))
-      (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
-                            :mesh btr::tree3 :mass 0.2 :color (0 0 0)))
-        (assert (btr:object ?w btr:mesh tree-4 ((6 0 0)(0 0 0 1))
-                            :mesh btr::tree4 :mass 0.2 :color (0 0 0)))))))
+                                   (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
+                                                       :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
+                                   (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
+                                                       :mesh btr::tree2 :mass 0.2 :color (0 0 0)))
+                                   (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
+                                                       :mesh btr::tree3 :mass 0.2 :color (0 0 0)))
+                                   (assert (btr:object ?w btr:mesh tree-4 ((6 0 0)(0 0 0 1))
+                                                       :mesh btr::tree4 :mass 0.2 :color (0 0 0)))))))
 
 (defun spawn-robot ()
   (crs::force-ll 
@@ -105,7 +104,31 @@
                                               (for ,object-name)))))
       (crs:prolog `(assign-robot-pos-to ,des-for-loc ,object-name)))))
 
+;;;;;;;;;;;;;;CREATE DESIGNATORS;;;;;;;;;;;;;;;;;;;;;;
 
+(defun make-obj-desig (obj-name)
+  (make-designator `object `((desig-props:name ,obj-name))))
+
+;;;;;;;;;;;;;HERE STARTS THE PROJECTION;;;;;;;;;;;;;;;
+
+(defun set-object-in-projection ()
+  (go-to-object))
+
+(cpl-impl:def-top-level-cram-function go-to-object ()
+ (cram-projection:with-projection-environment
+   projection-process-modules::pr2-bullet-projection-environment
+      (setf tree1 (make-obj-desig 'tree-1))))
+
+   
+
+
+;(cpl-impl:def-cram-function find-object-in-world (object-name)
+;"Returns an designator."
+; (plan-lib:with-designator 
+   ;  (;(object-in-world (desig-props:location `((beside-of tree-2)
+       ;                                        (name ,object-name
+
+      ;(reference loc)
 
 (def-fact-group build-test-world()
   (<- (assign-robot-pos-to ?desig ?obj-name) 
@@ -166,7 +189,7 @@
 ;;   (btr:once 
 ;;    (btr:bound ?loc-desig)
 ;;    (btr:bullet-world ?w)
-;;    (btr:desig-solutions ?loc-desig ?solutions)
+;;    (btr:desig-solutions ?loc-desig ?solutions),
 ;;    (btr:take 6 ?solutions ?6-solutions)
 ;;    (btr:member ?solution ?6-solutions)
 ;;    (assert (btr:object-pose-on ?w ?obj-name ?solution)))))
@@ -185,7 +208,14 @@
  (defun end-myros ()
    (roslisp-utilities:shutdown-ros))
 
-;; (defun start-projection ()
+ (defun create-costmap ()
+   (let (( transform (cl-transforms:make-transform (cl-transforms:make-3d-vector 0 0 0)
+                                 (cl-transforms:make-quaternion 0 0 0 1)))
+         ( desig (make-designator 'desig-props:location `((right-of ,transform))))
+         ( sampled-pose  (reference desig)))))
+         
+
+   ;; (defun start-projection ()
 ;;  ; (right-arm-joint)
 ;; )
 
@@ -271,4 +301,3 @@
 
  
 
-q
