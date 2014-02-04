@@ -32,23 +32,26 @@
   :description "SHERPA SPATIAL RELATIONS"
   
   :depends-on (cram-language
-	       roslisp
-	       cram-pr2-knowledge
-	       pr2-manipulation-knowledge
-	       cram-plan-library
-	       cram-plan-knowledge
-	       pr2-manipulation-process-module
-	       cram-environment-representation
-	       object-location-designators
-	       simple-knowledge
-	       bullet-reasoning-designators
-	       actionlib)
+               location-costmap
+               roslisp
+               cram-pr2-knowledge
+               pr2-manipulation-knowledge
+               cram-plan-library
+               pr2-manipulation-process-module
+               cram-environment-representation
+;;               object-location-designators
+;;               cram-plan-knowledge
+               projection-process-modules
+ ;;              simple-knowledge
+               bullet-reasoning-designators
+               actionlib)
  :components 
  ((:module "src"
 	   :components
 	   ((:file "package")
-	    (:file "prolog" :depends-on ("package"))
-	    (:file "knowledge" :depends-on("package"))
-            (:file "build-test-world" :depends-on("package"))
-	    (:file "model_database" :depends-on("package"))
-            (:file "designator-integration" :depends-on("package"))))))
+      (:file "cost-functions" :depends-on ("package"))
+	    (:file "prolog" :depends-on ("package" "cost-functions"))
+	    (:file "costmap-knowledge" :depends-on("package"))
+      (:file "build-test-world" :depends-on("package" "prolog" "costmap-knowledge"))
+;;      (:file "designator-integration" :depends-on("package"))
+      ))))
