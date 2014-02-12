@@ -26,66 +26,89 @@
 ;;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ;;; POSSIBILITY OF SUCH DAMAGE.
 
-
 (in-package :sherpa)
 
-(defvar *list* nil)
-(defvar *joint-list* nil)
-(defvar *joint-states-sub* nil)
-(defparameter *amount-of-victims* 1)
-(defparameter *tree-hash-table* (make-hash-table))
 (defun start-scenario ()
-  (start-myros)
+  (roslisp-utilities:startup-ros :anonymous nil)
   (start-bullet-with-robot)
+  (spawn-tree)
+  (spawn-robot)
   (pr2-execute-trajectory)
-  (end-myros))
+  (go-into-this-direction)) 
 
-;;starting the bullet_visualization with the pr2
-;;TODO MESHES!!!
 (defun start-bullet-with-robot ()
-(setf *list* nil)
-(let* (;(quad-urdf (cl-urdf:parse-urdf (roslisp:get-param "quad1/robot_description")))
-       (pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description"))))
-  (setf *list*
-	(car 
-	 (crs::force-ll
-	  (crs:prolog
-	   `(and
-	     (btr:clear-bullet-world)
-	     (btr:bullet-world ?w)
-	     (assert (btr:object ?w btr:static-plane floor ((0 0 0) (0 0 0 1))
-                           :normal (0 0 1) :constant 0))
-       (btr:debug-window ?w)
-       ;; (assert (btr:object ?w btr:urdf quad ((1 1 1) (0 0 0 1)) :urdf ,quad-urdf))
-       (assert (btr:object ?w btr:urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
-       (btr:robot-arms-parking-joint-states ?joint-states)
-       (assert (btr:joint-state ?w pr2 ?joint-states))
-       (assert (btr:joint-state ?w pr2 (("torso_lift_joint" 0.33)))))))))))
-	      
-;;spawning some trees
+  (roslisp:ros-info (sherpa-spatial-relations) "SPAWN ROBOT INTO WORLD")
+  (setf *list* nil)
+  (let* ((pr2-urdf (cl-urdf:parse-urdf (roslisp:get-param "robot_description"))))
+    (setf *list*
+          (car 
+           (force-ll
+            (prolog
+             `(and
+               (clear-bullet-world)
+               (bullet-world ?w)
+               (assert (object ?w static-plane floor ((0 0 0) (0 0 0 1))
+                               :normal (0 0 1) :constant 0))
+               (debug-window ?w)
+               (assert (object ?w urdf pr2 ((0 0 0) (0 0 0 1)) :urdf ,pr2-urdf)) 
+               (robot-arms-parking-joint-states ?joint-states)
+               (assert (joint-state ?w pr2 ?joint-states))
+               (assert (joint-state ?w pr2 (("torso_lift_joint" 0.33)))))))))))
+
+
+(defun visible-object-in-the-world ()
+(force-ll (prolog '(and 
+                    (bullet-world ?w)
+                    (robot ?r)
+                    (visible ?w ?r ?o)))))
+
+
 (defun spawn-tree ()
-  (crs::force-ll (crs:prolog `(and (btr:bullet-world ?w)
-                                   (assert (btr:object ?w btr:mesh tree-1 ((4 -4 0)(0 0 0 1))
+  (roslisp:ros-info (sherpa-spatial-relations) "SPAWN TREE INTO WORLD")
+  (force-ll (prolog `(and (bullet-world ?w)
+                                   (assert (object ?w mesh tree-1 ((9 -4 0)(0 0 0 1))
                                                        :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
-                                   (assert (btr:object ?w btr:mesh tree-2 ((6 -6 0)(0 0 0 1))
-                                                       :mesh btr::tree2 :mass 0.2 :color (0 0 0)))
-                                   (assert (btr:object ?w btr:mesh tree-3 ((5 -5 0)(0 0 0 1))
+				   (assert (object ?w mesh tree-3 ((9 -5 0)(0 0 0 1))
                                                        :mesh btr::tree3 :mass 0.2 :color (0 0 0)))
-                                   (assert (btr:object ?w btr:mesh tree-4 ((6 0 0)(0 0 0 1))
-                                                       :mesh btr::tree4 :mass 0.2 :color (0 0 0)))))))
+
+                                   (assert (object ?w mesh tree-4 ((6 0 0)(0 0 0 1))
+                                                       :mesh btr::tree4 :mass 0.2 :color (0 0 0)))
+                                   (assert (object ?w mesh tree-8 ((6 1 0)(0 0 0 1))
+                                                       :mesh btr::tree3 :mass 0.2 :color (0 0 0)))
+                                   (assert (object ?w mesh tree-9 ((6.5 2 0)(0 0 0 1))
+                                                       :mesh btr::tree2 :mass 0.2 :color (0 0 0)))
+				   (assert (object ?w mesh tree-10 ((5.5 3 0)(0 0 0 1))
+                                                      :mesh btr::tree1 :mass 0.2 :color (0 0 0)))
+))))
+
+
+(defun change-tree ()
+  (prolog `(and (bullet-world ?w)
+		(object-type ?w ?obj btr::household-object)
+		(retract (object ?w tree-4))
+		(assert (object ?w btr:mesh tree-4 ((4 0 0)(0 0 0 1))
+				:mesh btr::tree4 :mass 0.2 :color (1 0 1))))))
+
+
+(defun default-tree ()
+  (prolog `(and (bullet-world ?w)
+		(object-type ?w ?obj btr::household-object)
+		(retract (object ?w tree-4))
+		(assert (object ?w mesh tree-4 ((4 0 0)(0 0 0 1))
+				:mesh btr::tree4 :mass 0.2 :color (0 0 0))))))
 
 (defun spawn-robot ()
-  (crs::force-ll 
-   (crs:prolog `(and (btr:bullet-world ?w)
-                     (assert (btr:object ?w btr:mesh quad-1 ((1 1 1)(0 0 0 1))
-                                         :mesh btr::quad1 :mass 0.2 :color (1 0 0)))))))
+  (force-ll 
+   (prolog `(and (bullet-world ?w)
+		 (assert (object ?w mesh quad-1 ((0 1 2)(0 0 0 1))
+				 :mesh btr::quad1 :mass 0.2 :color (1 0 0)))))))
 
 ;;remove all trees considering the object-type
 (defun remove-tree () 
    (crs::force-ll (crs:prolog `(and (btr:bullet-world ?w)
-                                              (btr:object-type ?w ?obj btr::household-object)
-                                              (btr:retract (btr:object ?w ?obj))))))
-  
+                                    (btr:object-type ?w ?obj btr::household-object)
+                                    (btr:retract (btr:object ?w ?obj))))))
+;;execute a certain position with the joints  
 (defun pr2-execute-trajectory ()
   (crs:prolog
    `(assert (btr:joint-state ?w ?robot (("r_shoulder_pan_joint" 0.0)
@@ -96,49 +119,191 @@
                                         ("r_wrist_flex_joint" 0.0)
                                         ("r_wrist_roll_joint" 1.5))))))
 
-(defun pointing-into-direction (object-name)
-  (cram-language-implementation:top-level
-    (plan-lib:with-designators
-        ((des-for-loc (desig-props:location `((right-of tree-1) 
-                                              (far-from tree-1) 
-                                              (for ,object-name)))))
-      (crs:prolog `(assign-robot-pos-to ,des-for-loc ,object-name)))))
+
+                                        ;(defun go-into-direction ()
+                                        ;(change-tree)
+                                        ;(time
+                                        ; (compute-multiple-obj-pose 'tree-4)))
+
+
+;; (defun compute-multiple-obj-pose ()
+;;   (format t "we are inside compute multiple ~%")
+;;   (let ((desig-1 (make-obj-desig-close-to-tree))
+;;         (desig-2 (make-obj-desig-close-to-robot)))
+;;     (crs:prolog `(compute-obj-pose ,desig))
+;;     ))
+
+
+;;start the rosnode 
+(defun start-myros ()
+  (roslisp:ros-info (sherpa-spatial-relations) "START the ROSNODE")
+  (roslisp-utilities:startup-ros :anonymous nil))
+
+;; ;;finish the rosnode
+(defun end-myros ()
+  (roslisp:ros-info (sherpa-spatial-relations) "KILL the ROSNODE")
+  (roslisp-utilities:shutdown-ros))
+
+;; ;;build the costmap from position of the robot 
+(defun go-into-direction ()
+  (roslisp:ros-info (sherpa-spatial-relations) "GO INTO POINTED DIRECTION")
+ ; (change-tree)
+  (let* ((transform-1 (cl-transforms:make-transform (cl-transforms:make-3d-vector 6 -0.5 0)
+                                                    (cl-transforms:make-quaternion 0 0 0 1)))
+         (desig (make-designator 'desig-props:location `((right-of ,transform-1))))
+         
+         (pose (reference desig)))
+    (roslisp:ros-info (sherpa-spatial-relations) "RETURN POSITION ~a FOR ROBOT TO GO" pose)
+    (prolog `(and 
+              (bullet-world ?w)
+              (assert (object-pose ?w quad-1 ,pose))))))
+
+
 
 ;;;;;;;;;;;;;;CREATE DESIGNATORS;;;;;;;;;;;;;;;;;;;;;;
 
-(defun make-obj-desig (obj-name)
-  (make-designator `object `((desig-props:name ,obj-name))))
-
-;;;;;;;;;;;;;HERE STARTS THE PROJECTION;;;;;;;;;;;;;;;
-
-(defun set-object-in-projection ()
-  (go-to-object))
-
-(cpl-impl:def-top-level-cram-function go-to-object ()
- (cram-projection:with-projection-environment
-   projection-process-modules::pr2-bullet-projection-environment
-      (setf tree1 (make-obj-desig 'tree-1))))
-
-   
+(defun make-obj-desig-close-to-tree ()
+ (format t "create object desig for tree ~%")
+ (let* ((transform (cl-transforms:make-transform (cl-transforms:make-3d-vector 0 0 0)
+                                                  (cl-transforms:make-quaternion 0 0 0 1))))
+         (make-designator 'desig-props:location `((right-of-tree ,transform)))))
 
 
-;(cpl-impl:def-cram-function find-object-in-world (object-name)
-;"Returns an designator."
-; (plan-lib:with-designator 
-   ;  (;(object-in-world (desig-props:location `((beside-of tree-2)
-       ;                                        (name ,object-name
+(defun make-obj-desig-close-to-robot ()
+ (format t "create object desig for robot ~%")
+ (let* ((transform (cl-transforms:make-transform (cl-transforms:make-3d-vector 0 1 2)
+                                                  (cl-transforms:make-quaternion 0 0 0 1))))
+         (make-designator 'desig-props:location `((right-of ,transform)))))
 
-      ;(reference loc)
 
-(def-fact-group build-test-world()
-  (<- (assign-robot-pos-to ?desig ?obj-name) 
-    (btr::bound ?obj-name)
-    (btr::bound ?desig)
-    (btr:bullet-world ?world)
-    (btr::desig-solutions ?desig ?solutions)
-    (btr::take 6 ?solutions ?6-solutions)
-    (btr::member ?solution ?6-solutions)
-    (assert (btr::object-pose-on ?world ?obj-name ?solution))))
+;;(defun find-obj-pose (obj-type obj-name)
+;; "this is hard coded and give the object-pose back"
+;;(setf obj-pose (cdr (assoc '?pose (cdar (force-ll (prolog `(and (bullet-world ?w)
+;;					     (object-type ?w ,obj-name ,obj-type)
+;;					     (object-pose ?w ,obj-name ?pose))))))))
+;; obj-pose)
+			      
+(defun go-to-obj (obj-pose)
+  "this function returns a designator by getting the obj-pose and generating the costmap from the
+  view of the object"
+  (let ((desig (make-designator 'desig-props:location `((right-of ,obj-pose)))))
+    (reference desig)))
+
+
+(def-fact-group build-test-world ()
+  (<- (compute-obj-pose ?desig)
+    (once
+     (bound ?desig)
+     (bullet-world ?w)
+     (format "hello~%")
+     (desig-solutions ?desig ?solutions)
+     (format "1 ~a~%" ?solutions)
+     (take 1 ?solutions ?8-solutions) 
+     (btr::generate ?poses-on (btr::obj-poses-on 'tree-4 ?8-solutions ?w))
+     (member ?solution ?poses-on)
+     (assert (object-pose ?w 'tree-4 ?solution)))))
+
+
+
+    
+
+;;;;;;;;;;;;;Commented;;;;;;;;;;;;;
+
+
+
+;;(defun pointing-into-direction (object-name)
+;;  (cram-language-implementation:top-level
+;;    (plan-lib:with-designators
+;;        ((des-for-loc (desig-props:location `((right-of tree-1) 
+;;                                              (far-from tree-1) 
+;;                                              (for ,object-name)))))
+;;      (crs:prolog `(assign-robot-pos-to ,des-for-loc ,object-name)))))
+
+
+;; This Fuction returns a designator 
+;;(cpl::def-cram-function find-object-in-world (object-type object-name)
+"returns an object designator"
+;; (cram-plan-library:with-designators
+;;     ((in-world   (desig-props:location `((on ground)
+;; (name ,object-name))))
+;;      (the-object (desig-props:object `((type ,object-type)
+;; 				       (name ,object-name)))))
+;;   (reference in-world)
+;;   (plan-lib:perceive-object 'cram-plan-library:a the-object)))
+
+
+;; (defun go-robot-to-direction ()
+;;   (go-to-object))
+
+;; (cpl::def-top-level-cram-function go-to-object ()
+;;  (cram-projection:with-projection-environment
+;;    projection-process-modules::pr2-bullet-projection-environment
+;;       (let ((tree (go-robot-from-origin)))
+;; 	(go-robot-from-origin-near-tree tree))))
+
+
+
+;; (cpl::def-cram-function go-robot-from-origin-near-tree (object-type tree-obj)
+;;  (sb-ext:gc :full t)
+;;  (let ((robot (find-object-in-world 'btr:household_objects "tree4")))
+
+;;    (sb-ext:gc :full t)
+;;    (go-robot-near-target robot tree-obj)
+;;    ;;(ecase object-type
+;;    ;;(btr::tree4 '(desig-props:left-of)))
+;;    (sb-ext:gc :full t)))
+
+;; (cpl::def-cram-fuction go-robot-near-target (object-to-target tree-object
+;; 								  sherpa-spatial)
+;;   (cram-plan-library:with-designators
+;;       ((go-there-loc (location `(,@(loop for property in sherpa-spatial
+;; 					collecting `(,property ,tree-object))
+;; 				   (near ,tree-object)(for ,object-to-target)
+;; 				   (on ???)))))
+;;     (plan-knowledge:achieve `(plan-knowledge:loc ,object-to-target ,go-there-loc)))
+
+
+
+;; (cpl-impl:def-top-level-cram-function go-to-object ()
+;;  (cram-projection:with-projection-environment
+;;    projection-process-modules::pr2-bullet-projection-environment
+;;       (let ((tree (go-robot-from-origin)))
+;; 	(
+
+;; (cpl-impl:def-cram-function go-robot-from-origin-near-object (robot-type tree-obj)
+;;   (sb-ext:gc :full t)
+;;   (let ((robot (find-object-on-counter object-type "CounterTop205")))
+;;     (sb-ext:gc :full t)
+;;     (put-object-near-plate obj plate-obj
+;;                            (ecase object-type
+;;                              (btr::fork '(desig-props:left-of))
+;;                              (btr::knife '(desig-props:right-of))
+;;                              (btr::mug '(desig-props:right-of desig-props:behind))))
+;;     (sb-ext:gc :full t)))
+
+
+
+;; ;; (cpl-impl:def-cram-function find-object-in-world (object-name)
+;; ;; "Returns an designator."
+;; ;;  (cram-plan-library:with-designators 
+;; ;;      ((loc-of-object (desig-props:location `((desig-props:name object-name)
+;; ;; 					       (desig-props:type object-type))))
+;; ;;       (the-object)
+;; ;;    (reference loc-of-object)
+;; ;;    (plan-lib:perceive-object 'cram-plan-library:a the-object)))) 
+;; ;;        ;                                        (name ,object-name
+
+;; ;;       ;(reference loc)
+
+;; (def-fact-group build-test-world()
+;;   (<- (assign-robot-pos-to ?desig ?obj-name) 
+;;     (btr::bound ?obj-name)
+;;     (btr::bound ?desig)
+;;     (btr:bullet-world ?world)
+;;     (btr::desig-solutions ?desig ?solutions)
+;;     (btr::take 6 ?solutions ?6-solutions)
+;;     (btr::member ?solution ?6-solutions)
+;;     (assert (btr::object-pose-on ?world ?obj-name ?solution))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;START WITH INCOMPLETE CODE;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;desig for a direction
@@ -202,18 +367,6 @@
 ;;                        (assert (btr:joint-state ?w ?robot ?joint-states)))))
 
 
- (defun start-myros ()
-   (roslisp-utilities:startup-ros :anonymous nil))
-
- (defun end-myros ()
-   (roslisp-utilities:shutdown-ros))
-
- (defun create-costmap ()
-   (let (( transform (cl-transforms:make-transform (cl-transforms:make-3d-vector 0 0 0)
-                                 (cl-transforms:make-quaternion 0 0 0 1)))
-         ( desig (make-designator 'desig-props:location `((right-of ,transform))))
-         ( sampled-pose  (reference desig)))))
-         
 
    ;; (defun start-projection ()
 ;;  ; (right-arm-joint)

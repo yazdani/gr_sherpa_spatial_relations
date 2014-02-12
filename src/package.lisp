@@ -33,6 +33,7 @@
 ;;        #:cpl
         #:cram-roslisp-common
         #:cram-designators
+;;	#:plan-lib
 ;;        #:cram-plan-library
         #:location-costmap
         #:cram-reasoning
@@ -40,5 +41,6 @@
         #:btr)
   (:shadowing-import-from #:btr object pose object-pose width height robot)
   (:import-from #:cram-reasoning #:<- #:def-fact-group)
+  (:import-from #:cram-pr2-knowledge pr2)
   (:export tree)
-  (:desig-properties #:go-to #:close-to #:right-of #:far-from #:for-robot #:name tree))
+  (:desig-properties #:go-to #:far-from #:close-to #:sourrounded-by #:right-of #:left-of #:type #:behind #:in-front #:for-robot #:name))

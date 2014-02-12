@@ -36,7 +36,7 @@
                roslisp
                cram-pr2-knowledge
                pr2-manipulation-knowledge
-               cram-plan-library
+;;               cram-plan-library
                pr2-manipulation-process-module
                cram-environment-representation
 ;;               object-location-designators

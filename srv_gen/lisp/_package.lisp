@@ -1,0 +1,10 @@
+(cl:defpackage sherpa_spatial_relations-srv
+  (:use )
+  (:export
+   "RETURNJOINTSTATES"
+   "<RETURNJOINTSTATES-REQUEST>"
+   "RETURNJOINTSTATES-REQUEST"
+   "<RETURNJOINTSTATES-RESPONSE>"
+   "RETURNJOINTSTATES-RESPONSE"
+  ))
+

@@ -30,11 +30,10 @@
 (in-package :sherpa)
 
 (def-fact-group costmap-metadata ()
-  (<- (costmap-size 8 8))
-  (<- (costmap-origin -4 -4))
+  (<- (costmap-size 6 6))
+  (<- (costmap-origin -3 -3))
   (<- (costmap-resolution 0.01))
   (<- (costmap-padding 0.38))
   (<- (costmap-manipulation-padding 0.38))
   (<- (costmap-in-reach-distance 1.0))
   (<- (costmap-reach-minimal-distance 0.2)))
-

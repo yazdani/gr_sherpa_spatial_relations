@@ -17,11 +17,14 @@
     
     </group>
 -->
-
+<!--
 <include file="$(find gazebo_ros)/launch/empty_world.launch">
 <arg name="world_name" value="$(find sherpa_gazebo)/worlds/sherpa.world" if="$(arg spawn_world)"/>
 </include>   
-
+-->
+<param name="tree1" textfile="$(find sherpa_spatial_relations)/models/tree1.urdf"/> 
+  <node name="tree1" pkg="gazebo" type="spawn_model" args="-urdf -param tree1 -x 4 -y -4 -z 0 -model tree1" respawn="false" output="screen"/> 
+<include file="$(find gazebo_worlds)/launch/empty_world.launch"/> 
 
 <!-- LOAD THE QUADROTOR INTO THE WORLD -->
 <!--
@@ -34,11 +37,17 @@
 -->
 <!--load the PR2 into the world-->
 <!-- Convert an xacro and put on parameter server -->
-
-<param name="robot_description" command="$(find xacro)/xacro.py $(find pr2_description)/robots/pr2.urdf.xacro" />
+<!--
+<param name="robot_description" command="$(find xacro)/xacro.py $(find pr2_description)/robots/pr2.urdf.xacro" />-->
 <!-- Spawn a robot into Gazebo -->
+<!--
+<param name="tree_description" textfile="$(find sherpa_spatial_relations)/models/tree_col-6.dae" />
 
+<node name="spawn_urdf" pkg="gazebo_worlds" type="spawn_model" args="-param tree_description -urdf -model tree" />
+-->
+<!--
 <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model pr2" />
+-->
  <!-- Include the launch file to start the semantic map node -->
 <!-- 
  <include file="$(find pr2_pick_and_place_scenario)/launch/startmap.launch" />

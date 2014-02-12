@@ -5,16 +5,16 @@
      <visual>
        <!-- <origin xyz="-4 -3 0"/> -->
         <geometry>
-        <mesh filename="package://sherpa_spatial_relations/models/tree1.stl"/>
+        <mesh filename="package://sherpa_spatial_relations/models/tree_col-6.dae"/>
         </geometry>
      </visual> 
-
+<!--
 <collision>
 <geometry>
-  <mesh filename="package://sherpa_spatial_relations/models/tree2.stl"/>
+  <mesh filename="package://sherpa_spatial_relations/models/tree-6.stl"/>
 </geometry>
-</collision>
-</link>
+</collision>-->
+
 <!-- <collision>-->
       <!--<origin xyz="-4 -3 0"/> -->     
 <!--       <geometry>
@@ -27,11 +27,11 @@
         <sphere radius="2"/>
        </geometry>
 </collision>-->
- <!--<inertial>
+ <inertial>
        <mass value="1" />
 	<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
        </inertial>
-</link>-->
+</link>
 <!--
 <link name="base_link">
      <visual>

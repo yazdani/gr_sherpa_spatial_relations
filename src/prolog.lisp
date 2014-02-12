@@ -28,23 +28,48 @@
 
 (in-package :sherpa)
 
-(defmethod costmap-generator-name->score ((name (eql 'spatial-relation-generator))) 5)
+(defmethod costmap-generator-name->score ((name (eql 'sherpa-spatial-generator))) 5)
 
-(def-fact-group sherpa-spatial-designators (desig-costmap)
+(defclass range-generator () ())
+(defmethod costmap-generator-name->score ((name range-generator)) 2)
 
-;; (<- (action-desig ?desig (trajectory arm))
-;;    (bullet-world ?world)
-;;    (robot ?robot)
-;;    (desig-prop ?desig  (type trajectory))
-;;    (desig-prop ?desig  (side arm)
-;;    (desig-prop ?designator (values ?value))))
+(defclass gaussian-generator () ())
+(defmethod costmap-generator-name->score ((name gaussian-generator)) 6)
 
-;;right arm
-
+(def-fact-group spatial-relations-costmap (desig-costmap)
+  
+  (<- (desig-costmap ?designator ?costmap)
+    (desig-prop ?designator (left-of ?location))
+    (costmap ?costmap)
+    (costmap-add-function
+     sherpa-spatial-generator
+     (make-spatial-relation-cost-function ?location :Y >)
+     ?costmap))
+  
   (<- (desig-costmap ?designator ?costmap)
     (desig-prop ?designator (right-of ?location))
     (costmap ?costmap)
-    (costmap-add-function
-     spatial-relation-generator
+    (costmap-add-function 
+     sherpa-spatial-generator
      (make-spatial-relation-cost-function ?location :Y <)
+     ?costmap)
+    (costmap-add-height-generator
+     (make-constant-height-function 6.0)
+     ?costmap)) 
+
+  (<- (desig-costmap ?designator ?costmap)
+    (desig-prop ?designator (behind ?location))
+    (costmap ?costmap)
+    (costmap-add-function
+     sherpa-spatial-generator
+     (make-spatial-relation-cost-function ?location :X >)
+     ?costmap))
+  
+  (<- (desig-costmap ?designator ?costmap)
+    (desig-prop ?designator (in-front ?location))
+    (costmap ?costmap)
+    (costmap-add-function
+     sherpa-spatial-generator
+     (make-spatial-relation-cost-function ?location :X <)
      ?costmap)))
+
