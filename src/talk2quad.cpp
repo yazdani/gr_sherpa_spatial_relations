@@ -32,10 +32,10 @@ void get_model_pose(int argc, char **argv)
   start_pose.position.x =  getmodelstate.response.pose.position.x + 2;
   start_pose.position.y =  getmodelstate.response.pose.position.y;
   start_pose.position.z =  getmodelstate.response.pose.position.z +1;
-  //rt_pose.orientation.x = 0;
-  //start_pose.orientation.y =  0;
-  //start_pose.orientation.z =  0;
-  //start_pose.orientation.w =  0;
+  // //rt_pose.orientation.x = 0;
+  // //start_pose.orientation.y =  0;
+  // //start_pose.orientation.z =  0;
+  // //start_pose.orientation.w =  0;
 
   modelstate.pose = start_pose;
   //modelstate.twist = start_twist;
