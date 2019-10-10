@@ -125,13 +125,13 @@
                                         ;(time
                                         ; (compute-multiple-obj-pose 'tree-4)))
 
-
-;; (defun compute-multiple-obj-pose ()
-;;   (format t "we are inside compute multiple ~%")
-;;   (let ((desig-1 (make-obj-desig-close-to-tree))
-;;         (desig-2 (make-obj-desig-close-to-robot)))
-;;     (crs:prolog `(compute-obj-pose ,desig))
-;;     ))
+;;this one needs to be checked, otherwiese comment
+(defun compute-multiple-obj-pose ()
+  (format t "we are inside compute multiple ~%")
+  (let ((desig-1 (make-obj-desig-close-to-tree))
+        (desig-2 (make-obj-desig-close-to-robot)))
+    (crs:prolog `(compute-obj-pose ,desig))
+    ))
 
 
 ;;start the rosnode 
