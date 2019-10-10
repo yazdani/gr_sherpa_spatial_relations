@@ -36,13 +36,9 @@
                roslisp
                cram-pr2-knowledge
                pr2-manipulation-knowledge
-;;               cram-plan-library
                pr2-manipulation-process-module
                cram-environment-representation
-;;               object-location-designators
-;;               cram-plan-knowledge
                projection-process-modules
- ;;              simple-knowledge
                bullet-reasoning-designators
                actionlib)
  :components 
@@ -52,6 +48,4 @@
       (:file "cost-functions" :depends-on ("package"))
 	    (:file "prolog" :depends-on ("package" "cost-functions"))
 	    (:file "costmap-knowledge" :depends-on("package"))
-      (:file "build-test-world" :depends-on("package" "prolog" "costmap-knowledge"))
-;;      (:file "designator-integration" :depends-on("package"))
-      ))))
+      (:file "build-test-world" :depends-on("package" "prolog" "costmap-knowledge"))))))

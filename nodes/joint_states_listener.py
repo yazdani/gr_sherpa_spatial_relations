@@ -9,7 +9,6 @@ from sherpa_spatial_relations.srv import *
 from sensor_msgs.msg import JointState
 import threading
 
-
 #holds the latest states obtained from joint_states messages
 class LatestJointStates:
 
@@ -25,7 +24,6 @@ class LatestJointStates:
 
         s = rospy.Service('return_joint_states', ReturnJointStates, self.return_joint_states)
         
-
     #thread function: listen for joint_states messages
     def joint_states_listener(self):
         rospy.Subscriber('joint_states', JointState, self.joint_states_callback)
@@ -40,7 +38,6 @@ class LatestJointStates:
         self.velocity = msg.velocity
         self.effort = msg.effort
         self.lock.release()
-
 
     #returns (found, position, velocity, effort) for the joint joint_name 
     #(found is 1 if found, 0 otherwise)

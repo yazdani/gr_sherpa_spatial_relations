@@ -175,13 +175,13 @@
                                                   (cl-transforms:make-quaternion 0 0 0 1))))
          (make-designator 'desig-props:location `((right-of ,transform)))))
 
-
-;;(defun find-obj-pose (obj-type obj-name)
-;; "this is hard coded and give the object-pose back"
-;;(setf obj-pose (cdr (assoc '?pose (cdar (force-ll (prolog `(and (bullet-world ?w)
-;;					     (object-type ?w ,obj-name ,obj-type)
-;;					     (object-pose ?w ,obj-name ?pose))))))))
-;; obj-pose)
+;;maybe need to comment this function again
+(defun find-obj-pose (obj-type obj-name)
+"this is hard coded and give the object-pose back"
+(setf obj-pose (cdr (assoc '?pose (cdar (force-ll (prolog `(and (bullet-world ?w)
+					     (object-type ?w ,obj-name ,obj-type)
+					     (object-pose ?w ,obj-name ?pose))))))))
+obj-pose)
 			      
 (defun go-to-obj (obj-pose)
   "this function returns a designator by getting the obj-pose and generating the costmap from the
